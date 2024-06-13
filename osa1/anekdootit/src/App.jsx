@@ -1,5 +1,14 @@
 import { useState } from 'react'
 
+const Anecdote = ({ text, votes }) => {
+  return (
+    <>
+    <p>{text}</p>
+      <p>Has {votes} votes</p>
+    </>
+  )
+}
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -14,7 +23,7 @@ const App = () => {
 
   const [selected, setSelected] = useState(0)
   const [points, setPoints] = useState(new Array(anecdotes.length + 1).join('0').split('').map(parseFloat))
-  const [mostVoted, setMostVoted] = useState(-1)
+  const [mostVoted, setMostVoted] = useState(0)
 
   const randomIndex = () => {
     return Math.floor(Math.random() * anecdotes.length)
@@ -41,12 +50,11 @@ const App = () => {
   return (
     <>
       <h1>Anecdote of the day</h1>
-      <p>{anecdotes[selected]}</p>
-      <p>Has {points[selected]} votes</p>
+      <Anecdote text={anecdotes[selected]} votes={points[selected]} />
       <button onClick={handleVoting}>Vote</button>
       <button onClick={() => setSelected(randomIndex)}>Next anecdote</button>
       <h2>Anecdote with most votes</h2>
-      <p>{anecdotes[mostVoted]}</p>
+      <Anecdote text={anecdotes[mostVoted]} votes={points[mostVoted]} />
     </>
   )
 }
