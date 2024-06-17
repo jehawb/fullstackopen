@@ -3,7 +3,7 @@ import { useState } from 'react'
 const Anecdote = ({ text, votes }) => {
   return (
     <>
-    <p>{text}</p>
+      <p>{text}</p>
       <p>Has {votes} votes</p>
     </>
   )
@@ -33,7 +33,7 @@ const App = () => {
     const pointsCopy = [...points]
 
     pointsCopy[selected] += 1
-    
+
     setPoints(pointsCopy)
 
     let maxVotes = 0
