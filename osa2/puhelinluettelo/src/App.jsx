@@ -13,14 +13,18 @@ const App = () => {
 
   // Fetch the persons initially when the page is loaded using the service
   useEffect(() => {
-    personsService
-      .getAll()
-      .then(initialPersons => {
-        setPersons(initialPersons)
-      })
+    getAllPersons()
   }, [])
 
   // Functions
+  const getAllPersons = () => {
+    personsService
+      .getAll()
+      .then(fetchedPersons => {
+        setPersons(fetchedPersons)
+      })
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     const newPerson = {
@@ -32,11 +36,22 @@ const App = () => {
       alert(`${newName} is already in the phonebook`)
     } else {
       personsService
-      .create(newPerson)
+        .create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
+    }
+  }
+
+  const deletePerson = (name, id) => {
+    if (window.confirm(`Are you sure you want to delete ${name}`)) {
+      personsService
+      .remove(id)
       .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
+        console.log(`Deleted person ${returnedPerson.name} with number ${returnedPerson.number}`)
+        getAllPersons()
       })
     }
   }
@@ -61,7 +76,8 @@ const App = () => {
       <h2>Find persons by name</h2>
       <Filter
         searchName={searchName}
-        handleSearchNameChange={handleSearchNameChange} />
+        handleSearchNameChange={handleSearchNameChange}
+      />
 
       <h2>Add new person</h2>
       <PersonForm
@@ -73,7 +89,11 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons persons={persons} searchName={searchName} />
+      <Persons
+        persons={persons}
+        searchName={searchName}
+        deletePerson={deletePerson}
+      />
     </>
   )
 
