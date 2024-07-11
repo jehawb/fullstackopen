@@ -32,12 +32,26 @@ const App = () => {
       number: newNumber
     }
 
-    if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already in the phonebook`)
+    // Check if there is already person with that name
+    const foundPerson = persons.find(person => person.name === newName)
+
+    if (foundPerson) {
+      if (window.confirm(`${newName} found in the phonebook, replace the old number with the new one?`)) {
+        personsService
+          .update(foundPerson.id, newPerson)
+          .then(
+            returnedPerson => {
+              console.log(`Person '${returnedPerson.name}' updated`)
+              getAllPersons()   // Would it be better to manipulate the local state than fetch everything from the server?
+              setNewName('')
+              setNewNumber('')
+            })
+      }
     } else {
       personsService
         .create(newPerson)
         .then(returnedPerson => {
+          console.log(`Person '${returnedPerson.name}' with number '${returnedPerson.number}' added `)
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
@@ -48,11 +62,11 @@ const App = () => {
   const deletePerson = (name, id) => {
     if (window.confirm(`Are you sure you want to delete ${name}`)) {
       personsService
-      .remove(id)
-      .then(returnedPerson => {
-        console.log(`Deleted person ${returnedPerson.name} with number ${returnedPerson.number}`)
-        getAllPersons()
-      })
+        .remove(id)
+        .then(returnedPerson => {
+          console.log(`Deleted person '${returnedPerson.name}' with number '${returnedPerson.number}'`)
+          getAllPersons()
+        })
     }
   }
 
