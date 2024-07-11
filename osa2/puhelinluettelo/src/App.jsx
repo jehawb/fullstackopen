@@ -4,12 +4,14 @@ import personsService from './services/personsService'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
 
   // Fetch the persons initially when the page is loaded using the service
   useEffect(() => {
@@ -23,6 +25,13 @@ const App = () => {
       .then(fetchedPersons => {
         setPersons(fetchedPersons)
       })
+  }
+
+  const showMessage = (message) => {
+    setNotificationMessage(message)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 3000)
   }
 
   const addPerson = (event) => {
@@ -41,7 +50,7 @@ const App = () => {
           .update(foundPerson.id, newPerson)
           .then(
             returnedPerson => {
-              console.log(`Person '${returnedPerson.name}' updated`)
+              showMessage(`Person '${returnedPerson.name}' updated`)
               getAllPersons()   // Would it be better to manipulate the local state than fetch everything from the server?
               setNewName('')
               setNewNumber('')
@@ -51,7 +60,7 @@ const App = () => {
       personsService
         .create(newPerson)
         .then(returnedPerson => {
-          console.log(`Person '${returnedPerson.name}' with number '${returnedPerson.number}' added `)
+          showMessage(`Person '${returnedPerson.name}' with number '${returnedPerson.number}' added `)
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
@@ -64,7 +73,7 @@ const App = () => {
       personsService
         .remove(id)
         .then(returnedPerson => {
-          console.log(`Deleted person '${returnedPerson.name}' with number '${returnedPerson.number}'`)
+          showMessage(`Deleted person '${returnedPerson.name}' with number '${returnedPerson.number}'`)
           getAllPersons()
         })
     }
@@ -86,6 +95,8 @@ const App = () => {
   return (
     <>
       <h1>Phonebook</h1>
+
+      <Notification message={notificationMessage} />
 
       <h2>Find persons by name</h2>
       <Filter
