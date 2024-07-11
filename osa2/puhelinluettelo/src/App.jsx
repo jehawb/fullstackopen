@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import axios from 'axios'
+import personsService from './services/personsService'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
@@ -11,13 +11,16 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
 
+  // Fetch the persons initially when the page is loaded using the service
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons').then(response => {
-        setPersons(response.data)
+    personsService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
+  // Functions
   const addPerson = (event) => {
     event.preventDefault()
     const newPerson = {
@@ -28,12 +31,17 @@ const App = () => {
     if (persons.find(person => person.name === newName)) {
       alert(`${newName} is already in the phonebook`)
     } else {
-      setPersons(persons.concat(newPerson))
-      setNewName('')
-      setNewNumber('')
+      personsService
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
     }
   }
 
+  // Change handling
   const handleSearchNameChange = (event) => {
     setSearchName(event.target.value)
   }
