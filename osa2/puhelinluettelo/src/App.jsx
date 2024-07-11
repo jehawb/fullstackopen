@@ -12,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState(null)
 
   // Fetch the persons initially when the page is loaded using the service
   useEffect(() => {
@@ -27,11 +28,13 @@ const App = () => {
       })
   }
 
-  const showMessage = (message) => {
+  const showMessage = (message, type) => {
     setNotificationMessage(message)
+    setNotificationType(type)   // type checked in the component
     setTimeout(() => {
       setNotificationMessage(null)
-    }, 3000)
+      setNotificationType(null)
+    }, 5000)
   }
 
   const addPerson = (event) => {
@@ -55,12 +58,16 @@ const App = () => {
               setNewName('')
               setNewNumber('')
             })
+          .catch(error => {
+            showMessage(`${foundPerson.name} was deleted from the phonebook previously, no update made`, "error")
+            getAllPersons()
+          })
       }
     } else {
       personsService
         .create(newPerson)
         .then(returnedPerson => {
-          showMessage(`Person '${returnedPerson.name}' with number '${returnedPerson.number}' added `)
+          showMessage(`Person '${returnedPerson.name}' with number '${returnedPerson.number}' added`)
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
@@ -74,6 +81,10 @@ const App = () => {
         .remove(id)
         .then(returnedPerson => {
           showMessage(`Deleted person '${returnedPerson.name}' with number '${returnedPerson.number}'`)
+          getAllPersons()
+        })
+        .catch(error => {
+          showMessage(`${name} was already deleted from the phonebook`, "error")
           getAllPersons()
         })
     }
@@ -96,7 +107,7 @@ const App = () => {
     <>
       <h1>Phonebook</h1>
 
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage} type={notificationType} />
 
       <h2>Find persons by name</h2>
       <Filter
